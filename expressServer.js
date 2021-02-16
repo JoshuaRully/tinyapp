@@ -22,7 +22,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-//GETs below!
+// GETs below!
 
 app.get('/', (req, res) => {
   res.send('Hello!');
@@ -56,7 +56,7 @@ app.get('/u/:shortURL', (req, res) => {
 });
   
 
-//POSTs below!
+// POSTs below!
 
 app.post("/urls", (req, res) => {
   const shortURL = genRandomString();
@@ -65,6 +65,14 @@ app.post("/urls", (req, res) => {
   console.log(urlDatabase);
   res.redirect('/urls/' + String(shortURL));
 });
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const { shortURL } = req.params;
+  delete urlDatabase[shortURL];
+  res.redirect("/urls");
+});
+
+// The Gnomes are listening... :o
 
 app.listen(PORT, () => {
   console.log(`Example app is listening on port ${PORT}!`)
