@@ -80,7 +80,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 app.post('/urls/:shortURL/edit', (req, res) => {
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL].longURL = req.body.longURL;
+  urlDatabase[shortURL] = req.body.longURL;
   res.redirect('/urls');
 })
 
