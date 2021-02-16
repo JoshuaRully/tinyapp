@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require("body-parser");
+// import "bootswatch/dist/solar/bootstrap.min.css";
+// TODO: Note: Replace ^[theme]^ (examples: darkly, slate, cosmo, spacelab, and superhero. See https://bootswatch.com/ for current theme names.)
 
 const app = express();
 
@@ -63,18 +65,24 @@ app.get('/u/:shortURL', (req, res) => {
   
 // POSTs below!
 
-app.post("/urls", (req, res) => {
+app.post('/urls', (req, res) => {
   const shortURL = genRandomString();
   const { longURL } = req.body;
   urlDatabase[shortURL] = longURL;
   res.redirect('/urls/' + String(shortURL));
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.post('/urls/:shortURL/delete', (req, res) => {
   const { shortURL } = req.params;
   delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
+
+app.post('/urls/:shortURL/edit', (req, res) => {
+  const shortURL = req.params.shortURL;
+  urlDatabase[shortURL].longURL = req.body.longURL;
+  res.redirect('/urls');
+})
 
 // The Gnomes are listening... :o
 
