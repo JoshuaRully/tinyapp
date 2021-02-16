@@ -58,7 +58,7 @@ app.get('/u/:shortURL', (req, res) => {
     const longURL = urlDatabase[req.params.shortURL];
     res.redirect(longURL);
   } else {
-    // TODO: find better status code
+    // TODO: change to proper status code later
     res.redirect('https://http.cat/404');
   }
 });
