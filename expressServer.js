@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 // import "bootswatch/dist/solar/bootstrap.min.css";
 // TODO: Note: Replace ^[theme]^ (examples: darkly, slate, cosmo, spacelab, and superhero. See https://bootswatch.com/ for current theme names.)
 
@@ -8,6 +9,8 @@ const app = express();
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({extended: true}));
+
+app.use(cookieParser());
 
 const PORT = 8080;
 
@@ -83,6 +86,12 @@ app.post('/urls/:shortURL/edit', (req, res) => {
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect('/urls');
 });
+
+app.post('/login/', (req, res) => {
+  const { username } = req.body;
+  res.cookie('username', username);
+  res.redirect('/urls');
+})
 
 // The Gnomes are listening... :o
 
