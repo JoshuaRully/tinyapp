@@ -29,6 +29,10 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const username = {
+  blah: 'wefwefwef'
+}
+
 // GETs below!
 
 app.get('/', (req, res) => {
@@ -87,11 +91,16 @@ app.post('/urls/:shortURL/edit', (req, res) => {
   res.redirect('/urls');
 });
 
-app.post('/login/', (req, res) => {
+app.post('/login', (req, res) => {
   const { username } = req.body;
   res.cookie('username', username);
   res.redirect('/urls');
-})
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie('username', {path: '/'});
+  res.redirect(`/urls`);
+});
 
 // The Gnomes are listening... :o
 
