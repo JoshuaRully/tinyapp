@@ -82,7 +82,7 @@ app.post('/urls/:shortURL/edit', (req, res) => {
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect('/urls');
-})
+});
 
 // The Gnomes are listening... :o
 
