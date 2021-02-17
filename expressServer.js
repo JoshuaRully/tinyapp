@@ -69,6 +69,10 @@ app.get('/u/:shortURL', (req, res) => {
     res.redirect('https://http.cat/404');
   }
 });
+
+app.get('/register', (req, res) => {
+  res.render('register');
+})
   
 // POSTs below!
 
