@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
-const { genRandomString, getUserByEmail, checkPassword, urlsForUser } = require('./helpers'); 
+const { genRandomString, getUserByEmail, checkPassword } = require('./helpers');
 
 const app = express();
 
@@ -20,15 +20,15 @@ const urlDatabase = {
   i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
-const users = { 
+const users = {
   "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
+    id: "userRandomID",
+    email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
     password: "dishwasher-funk"
   }
 };
@@ -46,7 +46,7 @@ app.get('/urls', (req, res) => {
     let templateVars = { "urls": isUsersLink(urlDatabase, id), user };
     res.render("urlsIndex", templateVars);
   } else {
-    res.status(403).send("Please login or register first.")
+    res.status(403).send("Please login or register first.");
   }
 });
 
@@ -57,7 +57,7 @@ app.get("/urls/new", (req, res) => {
     let templateVars = { user };
     res.render("urlsNew", templateVars);
   } else {
-    res.redirect("/login")
+    res.redirect("/login");
   }
 });
 
@@ -69,7 +69,7 @@ app.get("/urls/:shortURL", (req, res) => {
     let templateVars = { shortURL, longURL: urlDatabase[shortURL].longURL, user };
     res.render("urlsShow", templateVars);
   } else {
-    res.send("Requested page was not found")
+    res.send("Requested page was not found");
   }
 });
 
@@ -91,7 +91,7 @@ app.get("/login", (req, res) => {
   const user = id ? users[id] : null;
   let templateVars = { user };
   res.render("login", templateVars);
-})
+});
   
 // POSTs below!
 
@@ -114,7 +114,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 
 app.post('/urls/:shortURL/edit', (req, res) => {
-  const userID = req.session.user_id
+  const userID = req.session.user_id;
   const shortURL = req.params.shortURL;
   let usersObj = isUsersLink(urlDatabase, userID);
   if (usersObj[shortURL]) {
@@ -131,7 +131,7 @@ app.post('/login', (req, res) => {
   const userID = getUserByEmail(loginEmail, users);
   const passwordCheck = checkPassword(loginEmail, loginPassword, users);
   if (userID && passwordCheck) {
-    req.session.user_id = userID;
+    req.session.userID = userID;
     res.redirect("/urls");
   } else {
     res.status(403).send("Invalid email or password combination.");
@@ -141,27 +141,40 @@ app.post('/login', (req, res) => {
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/login");
-})
+});
 
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
   if (email === "" || password === "") {
-    res.status(400).send("An email or password needs to be entered.")
-    return
+    res.status(400).send("An email or password needs to be entered.");
+    return;
   } else if (getUserByEmail(email, users)) {
-    res.status(400).send("Email is already in use.")
-    return
+    res.status(400).send("Email is already in use.");
+    return;
   } else {
     const userID = genRandomString();
     users[userID] = {
       id: userID,
       email: email,
       password: password
-    }
-    req.session.user_id = userID;
+    };
+    req.session.userID = userID;
     res.redirect("/urls");
   }
 });
+
+// implemented help functions below
+
+const isUsersLink = (id) => {
+  let arr = Object.values(urlDatabase);
+  let arrayOfURLS = [];
+  for (let obj of arr) {
+    if (obj.userID === id) {
+      arrayOfURLS.push(item.longURL);
+    }
+  }
+  return arrayOfURLS;
+};
 
 app.listen(PORT, () => {
   console.log(`Example app is listening on port ${PORT}!`);

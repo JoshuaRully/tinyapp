@@ -14,26 +14,15 @@ const getUserByEmail = (email, database) => {
       return database[user].id;
     }
   }
-}
+};
 
 const checkPassword = (loginemail, loginpassword, objectDb) => {
   for (let user in objectDb) {
-    if (objectDb[user].email === loginemail && bcrypt.compareSync(loginpassword, objectDb[user].password)) {
+    if (objectDb[user].email === loginemail && loginpassword) {
       return true;
     }
   }
   return false;
-}
+};
 
-const urlsForUser = (id) => {
-  let arr = Object.values(urlDatabase)
-  let arrayOfURLS = [];
-  for (let obj of arr) {
-    if (obj.userID === id) {
-      arrayOfURLS.push(item.longURL);
-    }
-  }
-  return arrayOfURLS;
-}
-
-module.exports =  { genRandomString, getUserByEmail, checkPassword, urlsForUser };
+module.exports =  { genRandomString, getUserByEmail, checkPassword};
