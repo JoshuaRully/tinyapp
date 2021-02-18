@@ -16,9 +16,9 @@ const getUserByEmail = (email, database) => {
   }
 };
 
-const checkPassword = (loginemail, loginpassword, objectDb) => {
-  for (let user in objectDb) {
-    if (objectDb[user].email === loginemail && loginpassword) {
+const checkPassword = (loginemail, loginpassword, objectDB) => {
+  for (let user in objectDB) {
+    if (objectDB[user].email === loginemail && bcrypt.compareSync(loginpassword, objectDB[user])) { // TODO: change bcrypt to async!!!
       return true;
     }
   }

@@ -1,6 +1,9 @@
 const express = require('express');
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser');
+// const cookieParser = require('cookie-parser'); so much pain caused by this yesterday...
+const bcrypt = require('bcrypt');
+const cookieSession = require('cookie-session');
+
 const { genRandomString, getUserByEmail, checkPassword } = require('./helpers');
 
 const app = express();
@@ -8,8 +11,12 @@ const app = express();
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static('public'));
+app.use(cookieSession({
+  name: 'sesh',
+  keys: ['gnarly', 'wicked', 'stoked', 'rad']
+}));
 
-app.use(cookieParser());
 
 const PORT = 8080;
 
@@ -156,7 +163,7 @@ app.post("/register", (req, res) => {
     users[userID] = {
       id: userID,
       email: email,
-      password: password
+      password: bcrypt.hashSync(password, 8) // TODO: change bcrypt to async!!!
     };
     req.session.userID = userID;
     res.redirect("/urls");
