@@ -8,7 +8,7 @@ const genRandomString = () => {
   return result;
 };
 
-const getUserByEmail = function (email, database) {
+const getUserByEmail = (email, database) => {
   for (let user in database) {
     if (database[user].email === email) {
       return database[user].id;
@@ -16,7 +16,7 @@ const getUserByEmail = function (email, database) {
   }
 }
 
-const checkPassword = function (loginemail, loginpassword, objectDb) {
+const checkPassword = (loginemail, loginpassword, objectDb) => {
   for (let user in objectDb) {
     if (objectDb[user].email === loginemail && bcrypt.compareSync(loginpassword, objectDb[user].password)) {
       return true;
@@ -25,4 +25,15 @@ const checkPassword = function (loginemail, loginpassword, objectDb) {
   return false;
 }
 
-module.exports =  { genRandomString, getUserByEmail, checkPassword };
+const urlsForUser = (id) => {
+  let arr = Object.values(urlDatabase)
+  let arrayOfURLS = [];
+  for (let obj of arr) {
+    if (obj.userID === id) {
+      arrayOfURLS.push(item.longURL);
+    }
+  }
+  return arrayOfURLS;
+}
+
+module.exports =  { genRandomString, getUserByEmail, checkPassword, urlsForUser };

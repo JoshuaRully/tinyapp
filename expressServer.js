@@ -1,9 +1,7 @@
 const express = require('express');
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
-const { genRandomString, getUserByEmail, checkPassword } = require('./helpers'); 
-// import "bootswatch/dist/solar/bootstrap.min.css";
-// TODO: Note: Replace ^[theme]^ (examples: darkly, slate, cosmo, spacelab, and superhero. See https://bootswatch.com/ for current theme names.)
+const { genRandomString, getUserByEmail, checkPassword, urlsForUser } = require('./helpers'); 
 
 const app = express();
 
@@ -18,8 +16,8 @@ const PORT = 8080;
 // test data below!
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
 const users = { 
@@ -34,55 +32,62 @@ const users = {
     password: "dishwasher-funk"
   }
 };
+
 // GETs below!
 
 app.get('/', (req, res) => {
-  res.send('/register');
+  res.redirect('/register');
 });
 
 app.get('/urls', (req, res) => {
-  const templateVars = {
-     urls: urlDatabase,
-     user: user[req.cookies.userID] 
-    }
-  res.render('urlsIndex', templateVars);
+  const id = req.session.user_id;
+  const user = id ? users[id] : null;
+  if (user) {
+    let templateVars = { "urls": isUsersLink(urlDatabase, id), user };
+    res.render("urlsIndex", templateVars);
+  } else {
+    res.status(403).send("Please login or register first.")
+  }
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = {
-    user: users[req.cookies.userID]
+  const id = req.session.user_id;
+  const user = id ? users[id] : null;
+  if (user) {
+    let templateVars = { user };
+    res.render("urlsNew", templateVars);
+  } else {
+    res.redirect("/login")
   }
-  res.render("urlsNew", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL]
-  };
-  res.render("urlsShow", templateVars);
-});
-
-app.get('/u/:shortURL', (req, res) => {
-  if (urlDatabase[req.params.shortURL]) {
-    const longURL = urlDatabase[req.params.shortURL];
-    res.redirect(longURL);
+  const { shortURL } = req.params;
+  const id = req.session.user_id;
+  const user = id ? users[id] : null;
+  if (user && urlDatabase[shortURL]) {
+    let templateVars = { shortURL, longURL: urlDatabase[shortURL].longURL, user };
+    res.render("urlsShow", templateVars);
   } else {
-    // TODO: change to proper status code later
-    res.redirect('https://http.cat/404');
+    res.send("Requested page was not found")
   }
 });
 
+app.get('/u/:shortURL', (req, res) => {
+  const { shortURL } = req.params;
+  const longURL = urlDatabase[shortURL].longURL;
+  res.redirect(`http://${longURL}`);
+});
+
 app.get('/register', (req, res) => {
-  const templateVars = {
-    urls: urlDatabase,
-    user: users[req.cookies.userID]
-  };
-  res.render('register', templateVars);
+  const id = req.session.user_id;
+  const user = id ? users[id] : null;
+  let templateVars = { user };
+  res.render("register", templateVars);
 });
 
 app.get("/login", (req, res) => {
-  const id = req.body.userID;
+  const id = req.session.user_id;
   const user = id ? users[id] : null;
   let templateVars = { user };
   res.render("login", templateVars);
@@ -99,14 +104,25 @@ app.post('/urls', (req, res) => {
 
 app.post('/urls/:shortURL/delete', (req, res) => {
   const { shortURL } = req.params;
-  delete urlDatabase[shortURL];
+  const userID = req.session.user_id;
+  if (userID) {
+    delete urlDatabase[shortURL];
+  } else {
+    res.send("Unauthorized request");
+  }
   res.redirect("/urls");
 });
 
 app.post('/urls/:shortURL/edit', (req, res) => {
+  const userID = req.session.user_id
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.longURL;
-  res.redirect('/urls');
+  let usersObj = isUsersLink(urlDatabase, userID);
+  if (usersObj[shortURL]) {
+    urlDatabase[shortURL].longURL = req.body.longURL;
+    res.redirect("/urls");
+  } else {
+    res.render("error", {ErrorStatus: 403, ErrorMessage: "You do not have access to edit this link."});
+  }
 });
 
 app.post('/login', (req, res) => {
@@ -127,7 +143,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/login");
 })
 
-app.post("/register", function (req, res) {
+app.post("/register", (req, res) => {
   const { email, password } = req.body;
   if (email === "" || password === "") {
     res.status(400).send("An email or password needs to be entered.")
@@ -142,7 +158,7 @@ app.post("/register", function (req, res) {
       email: email,
       password: password
     }
-    req.session.userID = userID;
+    req.session.user_id = userID;
     res.redirect("/urls");
   }
 });
