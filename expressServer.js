@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const { genRandomString } = require('./helpers'); 
 // import "bootswatch/dist/solar/bootstrap.min.css";
 // TODO: Note: Replace ^[theme]^ (examples: darkly, slate, cosmo, spacelab, and superhero. See https://bootswatch.com/ for current theme names.)
 
@@ -14,42 +15,44 @@ app.use(cookieParser());
 
 const PORT = 8080;
 
-const genRandomString = () => {
-  let result = '';
-  const char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = char.length;
-  for (let i = 0; i < 6; i++) {
-    result += char.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-};
+// test data below!
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-const username = {
-  blah: 'wefwefwef'
-}
-
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+};
 // GETs below!
 
 app.get('/', (req, res) => {
-  res.send('Hello!');
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+  res.send('/register');
 });
 
 app.get('/urls', (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {
+     urls: urlDatabase,
+     user: user[req.cookies.userID] 
+    }
   res.render('urlsIndex', templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urlsNew");
+  const templateVars = {
+    user: users[req.cookies.userID]
+  }
+  res.render("urlsNew", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -71,8 +74,12 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  res.render('register');
-})
+  const templateVars = {
+    urls: urlDatabase,
+    user: users[req.cookies.userID]
+  };
+  res.render('register', templateVars);
+});
   
 // POSTs below!
 
@@ -96,17 +103,29 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const { username } = req.body;
-  res.cookie('username', username);
+  const { userID } = req.body;
+  res.cookie('userID', userID);
   res.redirect('/urls');
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username', {path: '/'});
-  res.redirect(`/urls`);
-});
+  req.session = null;
+  res.redirect("/login");
+})
 
-// The Gnomes are listening... :o
+app.post("/register", function (req, res) {
+  const { email, password } = req.body;
+    const userID = genRandomString();
+    users[userID] = {
+      id: userID,
+      email: email,
+      password: password
+    };
+    // req.session.user_id = userID;
+    console.log(users);
+    res.cookie("userID", userID);
+    res.redirect("/urls");
+});
 
 app.listen(PORT, () => {
   console.log(`Example app is listening on port ${PORT}!`);

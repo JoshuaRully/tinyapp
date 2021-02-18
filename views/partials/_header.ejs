@@ -1,4 +1,5 @@
-<header>
+<html>
+  <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
     <a class="navbar-brand" href="/urls">TinyApp</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -9,27 +10,18 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
+
+    </div> 
+    <div class="navbar-nav">
+      <h1>Logged in as</h1>
+      <form class="form-inline" method="POST" action="/logout"></form>
+        <button class="btn btn-danger" type="submit">Logout</button>
+      </form>
+    </div> 
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" style="padding: 20px; color: whitesmoke" href="/register">Register</a>
+      <a class="nav-item nav-link" style="padding: 20px; color: whitesmoke" href="/login">Login</a>
     </div>
-    <form class="form-inline" action="/login " method="POST">
-      <div class="form-group mb-2">
-        <label for="longURL">Login:</label>
-        <input class="form-control" type="text" name="longURL" placeholder="username" style="width: 300px; margin: 1em">
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </div>
-    </form>
-  <!--  <div class="form-inline" style="margin-left: 600px"> 
-      <% if (username) {%>
-        <form class="form-inline" method="POST" action="/logout">
-          <a class="nav-item nav-link inline" style="padding: 20px">Logged in as <%= username %></a>
-          <button type="submit" class="btn btn-outline-secondary">Logout</button>
-        </form>
-      <%} else {%>
-        <div style="margin-left: 200px">
-            <form class="form-inline" method="POST" action="/login">
-              <a class="nav-item nav-link" style="padding: 20px;" href="/login">Login</a>
-          </form>
-        </div>
-      <%}%> 
-  </div> broken as heck--> 
   </nav>
 </header>
+</html>
