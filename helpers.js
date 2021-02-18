@@ -16,4 +16,13 @@ const getUserByEmail = function (email, database) {
   }
 }
 
-module.exports =  { genRandomString, getUserByEmail };
+const checkPassword = function (loginemail, loginpassword, objectDb) {
+  for (let user in objectDb) {
+    if (objectDb[user].email === loginemail && bcrypt.compareSync(loginpassword, objectDb[user].password)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+module.exports =  { genRandomString, getUserByEmail, checkPassword };

@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
-const { genRandomString, getUserByEmail } = require('./helpers'); 
+const { genRandomString, getUserByEmail, checkPassword } = require('./helpers'); 
 // import "bootswatch/dist/solar/bootstrap.min.css";
 // TODO: Note: Replace ^[theme]^ (examples: darkly, slate, cosmo, spacelab, and superhero. See https://bootswatch.com/ for current theme names.)
 
@@ -80,6 +80,13 @@ app.get('/register', (req, res) => {
   };
   res.render('register', templateVars);
 });
+
+app.get("/login", (req, res) => {
+  const id = req.body.userID;
+  const user = id ? users[id] : null;
+  let templateVars = { user };
+  res.render("login", templateVars);
+})
   
 // POSTs below!
 
@@ -103,30 +110,22 @@ app.post('/urls/:shortURL/edit', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const { userID } = req.body;
-  res.cookie('userID', userID);
-  res.redirect('/urls');
+  const loginEmail = req.body.loginemail;
+  const loginPassword = req.body.loginpassword;
+  const userID = getUserByEmail(loginEmail, users);
+  const passwordCheck = checkPassword(loginEmail, loginPassword, users);
+  if (userID && passwordCheck) {
+    req.session.user_id = userID;
+    res.redirect("/urls");
+  } else {
+    res.status(403).send("Invalid email or password combination.");
+  }
 });
 
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/login");
 })
-
-// TODO: check against replacement below
-// app.post("/register", function (req, res) {
-//   const { email, password } = req.body;
-//     const userID = genRandomString();
-//     users[userID] = {
-//       id: userID,
-//       email: email,
-//       password: password
-//     };
-//     // req.session.user_id = userID;
-//     console.log(users);
-//     res.cookie("userID", userID);
-//     res.redirect("/urls");
-// });
 
 app.post("/register", function (req, res) {
   const { email, password } = req.body;
