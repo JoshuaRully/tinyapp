@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
-const { genRandomString } = require('./helpers'); 
+const { genRandomString, getUserByEmail } = require('./helpers'); 
 // import "bootswatch/dist/solar/bootstrap.min.css";
 // TODO: Note: Replace ^[theme]^ (examples: darkly, slate, cosmo, spacelab, and superhero. See https://bootswatch.com/ for current theme names.)
 
@@ -113,18 +113,39 @@ app.post("/logout", (req, res) => {
   res.redirect("/login");
 })
 
+// TODO: check against replacement below
+// app.post("/register", function (req, res) {
+//   const { email, password } = req.body;
+//     const userID = genRandomString();
+//     users[userID] = {
+//       id: userID,
+//       email: email,
+//       password: password
+//     };
+//     // req.session.user_id = userID;
+//     console.log(users);
+//     res.cookie("userID", userID);
+//     res.redirect("/urls");
+// });
+
 app.post("/register", function (req, res) {
   const { email, password } = req.body;
+  if (email === "" || password === "") {
+    res.status(400).send("An email or password needs to be entered.")
+    return
+  } else if (getUserByEmail(email, users)) {
+    res.status(400).send("Email is already in use.")
+    return
+  } else {
     const userID = genRandomString();
     users[userID] = {
       id: userID,
       email: email,
       password: password
-    };
-    // req.session.user_id = userID;
-    console.log(users);
-    res.cookie("userID", userID);
+    }
+    req.session.userID = userID;
     res.redirect("/urls");
+  }
 });
 
 app.listen(PORT, () => {
