@@ -1,10 +1,9 @@
 const express = require('express');
 const bodyParser = require("body-parser");
-// const cookieParser = require('cookie-parser'); so much pain caused by this yesterday...
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 
-const { genRandomString, getUserByEmail, checkPassword } = require('./helpers');
+const { genRandomString, getUserByEmail } = require('./helpers');
 
 const app = express();
 
@@ -105,19 +104,12 @@ app.get("/login", (req, res) => {
 app.post('/urls', (req, res) => {
   const shortURL = genRandomString();
   const { longURL } = req.body;
-  urlDatabase[shortURL] = longURL;
-  res.redirect('/urls/' + String(shortURL));
-});
-
-app.post('/urls/:shortURL/delete', (req, res) => {
-  const { shortURL } = req.params;
   const userID = req.session.user_id;
-  if (userID) {
-    delete urlDatabase[shortURL];
-  } else {
-    res.send("Unauthorized request");
+  urlDatabase[shortURL] = {
+    longURL,
+    userID
   }
-  res.redirect("/urls");
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.post('/urls/:shortURL/edit', (req, res) => {
@@ -132,13 +124,24 @@ app.post('/urls/:shortURL/edit', (req, res) => {
   }
 });
 
+app.post('/urls/:shortURL/delete', (req, res) => {
+  const { shortURL } = req.params;
+  const userID = req.session.user_id;
+  if (userID) {
+    delete urlDatabase[shortURL];
+  } else {
+    res.send("Unauthorized request");
+  }
+  res.redirect("/urls");
+});
+
 app.post('/login', (req, res) => {
   const loginEmail = req.body.loginemail;
   const loginPassword = req.body.loginpassword;
   const userID = getUserByEmail(loginEmail, users);
   const passwordCheck = checkPassword(loginEmail, loginPassword, users);
   if (userID && passwordCheck) {
-    req.session.userID = userID;
+    req.session.user_id = userID;
     res.redirect("/urls");
   } else {
     res.status(403).send("Invalid email or password combination.");
@@ -163,14 +166,14 @@ app.post("/register", (req, res) => {
     users[userID] = {
       id: userID,
       email: email,
-      password: bcrypt.hashSync(password, 8) // TODO: change bcrypt to async!!!
+      password: bcrypt.hashSync(password, 10) // TODO: change bcrypt to async!!!
     };
     req.session.userID = userID;
-    res.redirect("/urls");
+    res.redirect("/login");
   }
 });
 
-// implemented help functions below
+// implemented helper functions below
 
 const isUsersLink = (id) => {
   let arr = Object.values(urlDatabase);
@@ -181,6 +184,15 @@ const isUsersLink = (id) => {
     }
   }
   return arrayOfURLS;
+};
+
+const checkPassword = (loginemail, loginpassword, objectDB) => {
+  for (let user in objectDB) {
+    if (objectDB[user].email === loginemail && bcrypt.compareSync(loginpassword, objectDB[user].password)) { // TODO: change bcrypt to async!!!
+      return true;
+    }
+  }
+  return false;
 };
 
 app.listen(PORT, () => {

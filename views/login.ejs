@@ -12,10 +12,10 @@
 
   <body>
 
-    <% include partials/_header %>
+    <%- include('partials/_header') %>
 
-    <main style="  padding: 100px; background-color:#959a9b">
-      <h2 style="margin-bottom: 2em">Please login below.</h5>
+    <main style="  padding: 100px">
+      <h2 style="margin-bottom: 2em"><b>Please login below</b></h5>
       <form action="/login" method="POST">
         <div class="form-group mb-2">
           <label for="login" style="margin-top: 1em; font-size: 20px" >email:</label>

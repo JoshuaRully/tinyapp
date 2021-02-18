@@ -16,13 +16,4 @@ const getUserByEmail = (email, database) => {
   }
 };
 
-const checkPassword = (loginemail, loginpassword, objectDB) => {
-  for (let user in objectDB) {
-    if (objectDB[user].email === loginemail && bcrypt.compareSync(loginpassword, objectDB[user])) { // TODO: change bcrypt to async!!!
-      return true;
-    }
-  }
-  return false;
-};
-
-module.exports =  { genRandomString, getUserByEmail, checkPassword};
+module.exports =  { genRandomString, getUserByEmail };
