@@ -29,4 +29,4 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 - Make an account to start creating short URLs
 - You may edit/delete your created links with the labeled buttons
-- You may share the shortURLS you've created with the following format http://localhost:8080/u/'shortURL' where 'shortURL represents the randomly generated link
+- You may share the shortURLS you've created with the following format "http://localhost:8080/u/'shortURL'" where 'shortURL' represents the randomly generated link
