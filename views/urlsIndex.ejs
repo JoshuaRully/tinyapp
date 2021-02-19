@@ -23,9 +23,9 @@
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %></td>
+            <td><%= urls[url].longURL %></td>
             <td>
-              <form method="GET" action="/urls/<%= url %>">
+              <form method="GET" action="/urls/<%= url %>/edit">
                 <button style="background-color:#28a745; color: whitesmoke; border-radius: 8px; padding: 10px 14px;" type="Submit"> Edit </button>
               </form>
             </td>
@@ -35,7 +35,7 @@
               </form>
             </td>
           </tr>
-          <% } %>
+          <%}%>
       </tbody>
     </table>
   </main>

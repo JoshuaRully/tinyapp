@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
+const methodOverride = require('method-override');
 
 const { genRandomString, getUserByEmail } = require('./helpers');
 
@@ -11,6 +12,7 @@ app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static('public'));
+app.use(methodOverride('_method'));
 app.use(cookieSession({
   name: 'sesh',
   keys: ['gnarly', 'wicked', 'stoked', 'rad']
@@ -112,16 +114,16 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-app.post('/urls/:shortURL/edit', (req, res) => {
+app.post("/urls/:shortURL/edit", (req, res) => {
   const userID = req.session.user_id;
-  const shortURL = req.params.shortURL;
-  let usersObj = isUsersLink(urlDatabase, userID);
-  if (usersObj[shortURL]) {
-    urlDatabase[shortURL].longURL = req.body.longURL;
-    res.redirect("/urls");
-  } else {
-    res.render("error", {ErrorStatus: 403, ErrorMessage: "You do not have access to edit this link."});
+  const { longURL } = req.body;
+  const { shortURL } = req.params;
+  if (userID !== urlDatabase[shortURL].userID) {
+    res.status(404).send('You do not have access to edit this link');
+    return;
   }
+  urlDatabase[shortURL] = { longURL, userID };
+  res.redirect(`/urls`);
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
@@ -168,7 +170,7 @@ app.post("/register", (req, res) => {
       email: email,
       password: bcrypt.hashSync(password, 10) // TODO: change bcrypt to async!!!
     };
-    req.session.userID = userID;
+    req.session.user_id = userID;
     res.redirect("/login");
   }
 });
