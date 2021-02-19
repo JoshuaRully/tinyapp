@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 const methodOverride = require('method-override');
 
-const { genRandomString, getUserByEmail } = require('./helpers');
+const { genRandomString, getUserByEmail, urlsForUser } = require('./helpers');
 
 const app = express();
 
