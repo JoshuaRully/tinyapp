@@ -16,15 +16,4 @@ const getUserByEmail = (email, database) => {
   }
 };
 
-const urlsForUser = function (id) {
-  let arr = Object.values(urlDatabase);
-  let arrayOfURLS = [];
-  for (let obj of arr) {
-    if (obj.userID === id) {
-      arrayOfURLS.push(item.longURL);
-    }
-  }
-  return arrayOfURLS;
-}
-
-module.exports =  { genRandomString, getUserByEmail, urlsForUser };
+module.exports =  { genRandomString, getUserByEmail };

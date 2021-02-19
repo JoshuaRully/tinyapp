@@ -2,9 +2,8 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
-const methodOverride = require('method-override');
 
-const { genRandomString, getUserByEmail, urlsForUser } = require('./helpers');
+const { genRandomString, getUserByEmail } = require('./helpers');
 
 const app = express();
 
@@ -12,7 +11,6 @@ app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static('public'));
-app.use(methodOverride('_method'));
 app.use(cookieSession({
   name: 'sesh',
   keys: ['key1', 'key2']
@@ -111,8 +109,7 @@ app.post('/urls', (req, res) => {
   urlDatabase[shortURL] = {
     longURL,
     userID
-  }
-  console.log("test123", urlDatabase);
+  };
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -186,7 +183,7 @@ const isUsersLink = (id) => {
       result[obj] = {
         shortURL: obj,
         longURL: urlDatabase[obj].longURL,
-      } 
+      };
       
     }
   }
