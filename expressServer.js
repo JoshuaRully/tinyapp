@@ -15,7 +15,7 @@ app.use(express.static('public'));
 app.use(methodOverride('_method'));
 app.use(cookieSession({
   name: 'sesh',
-  keys: ['gnarly', 'wicked', 'stoked', 'rad']
+  keys: ['key1', 'key2']
 }));
 
 
@@ -51,7 +51,7 @@ app.get('/urls', (req, res) => {
   const id = req.session.user_id;
   const user = id ? users[id] : null;
   if (user) {
-    let templateVars = { "urls": isUsersLink(urlDatabase, id), user };
+    let templateVars = { urls: isUsersLink(id), user };
     res.render("urlsIndex", templateVars);
   } else {
     res.status(403).send("Please login or register first.");
@@ -84,7 +84,8 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   const { shortURL } = req.params;
   const longURL = urlDatabase[shortURL].longURL;
-  res.redirect(`http://${longURL}`);
+  //if the longurl contains Http then do some logic else other logic.
+  res.redirect(longURL);
 });
 
 app.get('/register', (req, res) => {
@@ -111,6 +112,7 @@ app.post('/urls', (req, res) => {
     longURL,
     userID
   }
+  console.log("test123", urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -178,14 +180,17 @@ app.post("/register", (req, res) => {
 // implemented helper functions below
 
 const isUsersLink = (id) => {
-  let arr = Object.values(urlDatabase);
-  let arrayOfURLS = [];
-  for (let obj of arr) {
-    if (obj.userID === id) {
-      arrayOfURLS.push(item.longURL);
+  let result = {};
+  for (let obj in urlDatabase) {
+    if (urlDatabase[obj].userID === id) {
+      result[obj] = {
+        shortURL: obj,
+        longURL: urlDatabase[obj].longURL,
+      } 
+      
     }
   }
-  return arrayOfURLS;
+  return result;
 };
 
 const checkPassword = (loginemail, loginpassword, objectDB) => {
