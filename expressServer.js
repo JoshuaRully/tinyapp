@@ -82,7 +82,7 @@ app.get('/urls/:shortURL', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   const { shortURL } = req.params;
   const longURL = urlDatabase[shortURL].longURL;
-  //if the longurl contains Http then do some logic else other logic.
+  // TODO: if the longurl contains Http then do some logic else other logic.
   res.redirect(longURL);
 });
 
