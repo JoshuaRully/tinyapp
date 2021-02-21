@@ -170,7 +170,7 @@ app.post('/register', (req, res) => {
       password: bcrypt.hashSync(password, 10) // TODO: change bcrypt to async!!!
     };
     req.session.user_id = userID;
-    res.redirect('/login');
+    res.redirect('/urls');
   }
 });
 
