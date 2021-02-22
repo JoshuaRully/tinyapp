@@ -133,14 +133,14 @@ app.post('/urls/:shortURL/edit', (req, res) => {
   res.redirect(`/urls`);
 });
 
-// deletes shortURL from database
+// deletes shortURL from database if they own the shortURL
 app.post('/urls/:shortURL/delete', (req, res) => {
   const { shortURL } = req.params;
   const userID = req.session.user_id;
-  if (userID) {
+  if (userID === urlDatabase[shortURL].userID) {
     delete urlDatabase[shortURL];
   }
-  if (!userID) {
+  if (userID !== urlDatabase[shortURL].userID) {
     res.send('Unauthorized request.');
     return;
   }
