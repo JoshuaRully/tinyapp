@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
-
 const { genRandomString, getUserByEmail } = require('./helpers');
 
 const app = express();
@@ -15,7 +14,6 @@ app.use(cookieSession({
   name: 'sesh',
   keys: ['key1', 'key2']
 }));
-
 
 const PORT = 8080;
 
@@ -32,7 +30,14 @@ const users = {
 // GETs below!
 
 app.get('/', (req, res) => {
-  res.redirect('/register');
+  const id = req.session.user_id;
+  const user = id ? users[id] : null;
+  if (user) {
+    let templateVars = { urls: isUsersLink(id), user };
+    res.render('urlsIndex', templateVars);
+  } else {
+    res.redirect('login');
+  }
 });
 
 // displays the users URLs if they are logged in
@@ -41,7 +46,7 @@ app.get('/urls', (req, res) => {
   const user = id ? users[id] : null;
   if (user) {
     let templateVars = { urls: isUsersLink(id), user };
-    res.render("urlsIndex", templateVars);
+    res.render('urlsIndex', templateVars);
   } else {
     res.status(403).send("Please login or register first.");
   }
