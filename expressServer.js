@@ -71,10 +71,12 @@ app.get('/urls/:shortURL', (req, res) => {
   const { shortURL } = req.params;
   const id = req.session.user_id;
   const user = id ? users[id] : null;
+  // rejects user if they try to access /urls/:shortURL if they do not own it
   if (urlDatabase[shortURL].userID !== id) {
-    res.send('You do not have permission to access this URL.');
+    res.status(404).send('You do not have access to edit this url');
     return;
   }
+  // directs user to edit page if the url is present in their urls
   if (user && urlDatabase[shortURL]) {
     let templateVars = { shortURL, longURL: urlDatabase[shortURL].longURL, user };
     res.render('urlsShow', templateVars);
@@ -106,6 +108,7 @@ app.get('/login', (req, res) => {
   
 // POSTs below!
 
+// generates a random 6 character string and assigns it to longURL
 app.post('/urls', (req, res) => {
   const shortURL = genRandomString();
   const { longURL } = req.body;
@@ -117,12 +120,13 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+// checks if user has access to edit the shortURL and directs accordingly
 app.post('/urls/:shortURL/edit', (req, res) => {
   const userID = req.session.user_id;
   const { longURL } = req.body;
   const { shortURL } = req.params;
   if (userID !== urlDatabase[shortURL].userID) {
-    res.status(404).send('You do not have access to edit this link');
+    res.status(404).send('You do not have access to edit this url');
     return;
   }
   urlDatabase[shortURL] = { longURL, userID };
