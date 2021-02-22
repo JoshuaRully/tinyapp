@@ -70,7 +70,7 @@ app.get('/urls/:shortURL', (req, res) => {
   const user = id ? users[id] : null;
   // rejects user if they try to access /urls/:shortURL if they do not own it
   if (urlDatabase[shortURL].userID !== id) {
-    res.status(404).send('You do not have access to edit this url');
+    res.status(404).send('You do not have access to edit this url.');
     return;
   }
   // directs user to edit page if the url is present in their urls
@@ -78,15 +78,18 @@ app.get('/urls/:shortURL', (req, res) => {
     let templateVars = { shortURL, longURL: urlDatabase[shortURL].longURL, user };
     res.render('urlsShow', templateVars);
   } else {
-    res.send('Requested page was not found');
+    res.send('Please login first.');
   }
 });
 
 app.get('/u/:shortURL', (req, res) => {
-  const { shortURL } = req.params;
-  const longURL = urlDatabase[shortURL].longURL;
+  const urlExists = urlDatabase[req.params.shortURL];
+  if (!urlExists) {
+    res.send('This short URL does not exist.');
+    return;
+  }
+  res.redirect(urlExists.longURL);
   // TODO: if the longurl contains Http then do some logic else other logic.
-  res.redirect(longURL);
 });
 
 app.get('/register', (req, res) => {
@@ -123,7 +126,7 @@ app.post('/urls/:shortURL/edit', (req, res) => {
   const { longURL } = req.body;
   const { shortURL } = req.params;
   if (userID !== urlDatabase[shortURL].userID) {
-    res.status(404).send('You do not have access to edit this url');
+    res.status(404).send('You do not have access to edit this url.');
     return;
   }
   urlDatabase[shortURL] = { longURL, userID };
@@ -137,7 +140,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   if (userID) {
     delete urlDatabase[shortURL];
   } else {
-    res.send('Unauthorized request');
+    res.send('Unauthorized request.');
   }
   res.redirect('/urls');
 });
