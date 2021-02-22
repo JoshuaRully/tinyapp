@@ -71,6 +71,10 @@ app.get('/urls/:shortURL', (req, res) => {
   const { shortURL } = req.params;
   const id = req.session.user_id;
   const user = id ? users[id] : null;
+  if (urlDatabase[shortURL].userID !== id) {
+    res.send('You do not have permission to access this URL.');
+    return;
+  }
   if (user && urlDatabase[shortURL]) {
     let templateVars = { shortURL, longURL: urlDatabase[shortURL].longURL, user };
     res.render('urlsShow', templateVars);
