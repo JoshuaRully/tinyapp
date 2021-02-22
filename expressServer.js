@@ -139,8 +139,10 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   const userID = req.session.user_id;
   if (userID) {
     delete urlDatabase[shortURL];
-  } else {
+  }
+  if (!userID) {
     res.send('Unauthorized request.');
+    return;
   }
   res.redirect('/urls');
 });
