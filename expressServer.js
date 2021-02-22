@@ -110,14 +110,16 @@ app.get('/login', (req, res) => {
 
 // generates a random 6 character string and assigns it to longURL
 app.post('/urls', (req, res) => {
-  const shortURL = genRandomString();
-  const { longURL } = req.body;
   const userID = req.session.user_id;
-  urlDatabase[shortURL] = {
-    longURL,
-    userID
-  };
-  res.redirect(`/urls/${shortURL}`);
+  if (userID) {
+    const shortURL = genRandomString();
+    const { longURL } = req.body;
+    urlDatabase[shortURL] = {
+      longURL,
+      userID
+    };
+    res.redirect(`/urls/${shortURL}`);
+  }
 });
 
 // checks if user has access to edit the shortURL and directs accordingly
