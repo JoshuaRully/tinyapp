@@ -22,21 +22,11 @@ const PORT = 8080;
 // test data below!
 
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
+
 };
 
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
-  },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  }
+
 };
 
 // GETs below!
@@ -45,6 +35,7 @@ app.get('/', (req, res) => {
   res.redirect('/register');
 });
 
+// displays the users URLs if they are logged in
 app.get('/urls', (req, res) => {
   const id = req.session.user_id;
   const user = id ? users[id] : null;
@@ -56,6 +47,7 @@ app.get('/urls', (req, res) => {
   }
 });
 
+// allows user to create new shortURL if they are logged in
 app.get('/urls/new', (req, res) => {
   const id = req.session.user_id;
   const user = id ? users[id] : null;
@@ -133,6 +125,7 @@ app.post('/urls/:shortURL/edit', (req, res) => {
   res.redirect(`/urls`);
 });
 
+// deletes shortURL from database
 app.post('/urls/:shortURL/delete', (req, res) => {
   const { shortURL } = req.params;
   const userID = req.session.user_id;
@@ -144,6 +137,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   res.redirect('/urls');
 });
 
+// checks password using bcrypt and logs user in if they have an account
 app.post('/login', (req, res) => {
   const loginEmail = req.body.loginemail;
   const loginPassword = req.body.loginpassword;
@@ -162,6 +156,7 @@ app.post('/logout', (req, res) => {
   res.redirect("/urls");
 });
 
+// registers a new user and hashes their password
 app.post('/register', (req, res) => {
   const { email, password } = req.body;
   if (email === "" || password === "") {
